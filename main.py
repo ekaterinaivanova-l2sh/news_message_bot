@@ -80,7 +80,31 @@ def remind_subscriptions(message):
             bot.send_message(message.chat.id, str(row[1]))
             send_something = True
         if not send_something:
-            bot.send_message(message.chat.id, 'Нет подписок!:')
+            bot.send_message(message.chat.id, 'Нет подписок!')
+
+
+@bot.message_handler(commands=['unsubscribe_all'])
+def unsubscribe_all(message):
+    with mutex:
+        sql = 'DELETE FROM USER WHERE id=?'
+        data = [
+            (message.chat.id,),
+        ]
+        with con:
+            con.executemany(sql, data)
+
+
+@bot.message_handler(commands=['get_news'])
+def update(message):
+    with con:
+        data = con.execute(f"SELECT * FROM USER WHERE id == {message.chat.id}")
+        send_something = False
+        for row in data:
+            bot.send_message(message.chat.id, '*На тему ' + str(row[1]) + '*',  parse_mode='Markdown')
+            send_google_news(message.chat.id, str(row[1]))
+            send_something = True
+        if not send_something:
+            bot.send_message(message.chat.id, 'Нет подписок!')
 
 
 bot.infinity_polling()
