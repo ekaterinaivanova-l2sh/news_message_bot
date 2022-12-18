@@ -3,8 +3,6 @@ import telebot
 import sqlite3 as sl
 from multiprocessing import Lock
 import os
-import asyncio
-from datetime import datetime
 
 mutex = Lock()
 
@@ -31,9 +29,21 @@ if not existed:
         """)
 
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "Привет! Чтобы узнать последние новости, введите то о чем вы хотите узнать")
+    welcome_message = 'Приветствую!\n' \
+                      'Воспользуйтесь \\help чтобы узнать список команд'
+    bot.reply_to(message, welcome_message)
+
+
+@bot.message_handler(commands=['help'])
+def send_help(message):
+    help_message = 'Напишите \\google и запрос после этого, чтобы узнать новости по этому запросу\n' \
+                   'Напиши \\subscribe чтобы подписаться на тему, \\unsubscribe_all чтобы отписаться от всех тем \n' \
+                   '\\remind возволяет узнать текущие подписки\n' \
+                   '\\get_news показывает новости на тему ваших подписок'
+
+    bot.reply_to(message, help_message)
 
 
 @bot.message_handler(commands=['ping'])
